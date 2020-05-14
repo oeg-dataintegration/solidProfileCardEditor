@@ -17,11 +17,8 @@ export default function Home(props){
                 </Title>
                     </Col>
                 </Row>
-                <Row justify="">
-                    <Col span={20}>
-                    <Editor/>
-                    </Col>
-                </Row>
+                <Editor/>
+
             </LoggedIn>
             <LoggedOut>
                 <h1>LOGIN PLS</h1>
