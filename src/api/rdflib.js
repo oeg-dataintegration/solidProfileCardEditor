@@ -65,17 +65,26 @@ export class ManageUserData{
         this.updater = null
         this.me = null
         this.profile = null
-        this.init(user)     
-        this.fetchData()
     }
-    init(user){
-        this.fetcher = new $rdf.Fetcher(this.store);
-        this.updater = new $rdf.UpdateManager(this.store)
-        this.me = this.store.sym(user);
-        this.profile = this.me.doc()
+    async init(user){
+        this.fetcher = await new $rdf.Fetcher(this.store);
+        this.updater = await new $rdf.UpdateManager(this.store)
+        this.me = await this.store.sym(user);
+        this.profile = await this.me.doc()
     }
-    fetchData(){
-        this.fetcher.load(this.profile)
+    async fetchData(){
+        await this.fetcher.load(this.profile)
+    }
+    async updateData(predicateUri,data){
+        return new Promise((resolve, reject) => {
+            const predicate = new $rdf.NamedNode(predicateUri)
+            const insert = $rdf.st(this.me, predicate, data, this.profile)
+            const del = this.store.statementsMatching(this.me, predicate, null, this.profile)
+            this.updater.update(del, insert, (uri, ok, message, response) => {
+                if (ok) resolve()
+                else reject(message)
+              }) 
+        }) 
     }
     sendQuery(uri="http://schema.org/name"){
         const predicate = new $rdf.NamedNode(uri)
